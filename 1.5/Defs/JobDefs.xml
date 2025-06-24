@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <JobDef>
+    <defName>TMF_CastAbility</defName>
+    <driverClass>TaranMagicFramework.JobDriver_CastAbility</driverClass>
+    <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+  </JobDef>
+
+  <JobDef>
+    <defName>TMF_CastAbilityUninterruptible</defName>
+    <driverClass>TaranMagicFramework.JobDriver_CastAbility</driverClass>
+    <casualInterruptible>false</casualInterruptible>
+    <collideWithPawns>true</collideWithPawns>
+    <playerInterruptible>false</playerInterruptible>
+    <suspendable>false</suspendable>
+  </JobDef>
+
+</Defs>

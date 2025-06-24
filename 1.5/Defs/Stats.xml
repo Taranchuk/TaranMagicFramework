@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <StatDef>
+        <defName>VEF_MeleeAttackSpeedFactor</defName>
+        <label>melee attack speed factor</label>
+        <description>A multiplier on melee attack speed.</description>
+		<category>PawnCombat</category>
+        <minValue>0</minValue>
+        <hideAtValue>1</hideAtValue>
+        <defaultBaseValue>1</defaultBaseValue>
+        <toStringStyle>PercentZero</toStringStyle>
+        <displayPriorityInCategory>3400</displayPriorityInCategory>
+    </StatDef>
+
+    <StatDef>
+        <defName>TMF_MeleeAttackDamageOffset</defName>
+        <label>melee damage offset</label>
+        <description>An offset on melee attack damage.</description>
+		<category>PawnCombat</category>
+        <minValue>0</minValue>
+        <hideAtValue>0</hideAtValue>
+        <defaultBaseValue>0</defaultBaseValue>
+		<toStringStyle>FloatOne</toStringStyle>
+        <displayPriorityInCategory>3400</displayPriorityInCategory>
+    </StatDef>
+	
+    <StatDef>
+        <defName>TMF_MeleeAttackArmorPenetrationOffset</defName>
+        <label>melee armor penetration offset</label>
+        <description>An offset on melee attack armor penetration.</description>
+		<category>PawnCombat</category>
+        <minValue>0</minValue>
+        <hideAtValue>0</hideAtValue>
+        <defaultBaseValue>0</defaultBaseValue>
+		<toStringStyle>PercentZero</toStringStyle>
+        <displayPriorityInCategory>3400</displayPriorityInCategory>
+    </StatDef>
+	
+    <StatDef>
+        <defName>TMF_MeleeAttackStunRate</defName>
+        <label>melee stun rate</label>
+        <description>A stun rate on melee attack.</description>
+		<category>PawnCombat</category>
+        <minValue>0</minValue>
+        <hideAtValue>0</hideAtValue>
+        <defaultBaseValue>0</defaultBaseValue>
+        <toStringStyle>PercentZero</toStringStyle>
+        <displayPriorityInCategory>3400</displayPriorityInCategory>
+    </StatDef>
+	
+</Defs>

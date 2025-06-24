@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<TMF.Energy>{0} energy</TMF.Energy>
+	<TMF.EnergyCost>{0} cost: {1}</TMF.EnergyCost>
+	<TMF.CooldownTime>Cooldown time: {0}</TMF.CooldownTime>
+	<TMF.Radius>Radius: {0}</TMF.Radius>
+	<TMF.AOERadius>AOE radius: {0}</TMF.AOERadius>
+	<TMF.NotEnoughEnergy>Not enough {0} energy. {1} energy is required to cast this ability.</TMF.NotEnoughEnergy>
+	<TMF.AlreadyUsingThisAbility>Already using this ability</TMF.AlreadyUsingThisAbility>
+	<TMF.DownedCannotUse>Downed, cannot use this ability.</TMF.DownedCannotUse>
+	<TMF.Level>Level: {0}</TMF.Level>
+	<TMF.PawnLevelUp>{PAWN_nameDef} has gained new {1} level.</TMF.PawnLevelUp>
+	<TMF.NotControllable>Not controllable</TMF.NotControllable>
+	<TMF.NextLevel>Next level</TMF.NextLevel>
+	<TMF.SkillPointsToLearn>Skill points to learn: {0}</TMF.SkillPointsToLearn>
+	<TMF.MasteryPointsToLearn>Mastery points to upgrade: {0}</TMF.MasteryPointsToLearn>
+	<TMF.MasteryProgress>Mastery: </TMF.MasteryProgress>
+	<TMF.MaxEnergyOffset>Max energy offset: {0}</TMF.MaxEnergyOffset>
+	<TMF.MovementSpeedFactor>Movement speed factor: {0}</TMF.MovementSpeedFactor>
+	<TMF.Duration>Duration: {0}</TMF.Duration>
+	<TMF.EnergyRegenRate>Energy regeneration rate per second: {0}</TMF.EnergyRegenRate>
+	<TMF.EnergyDrainRate>Energy drain rate per second: {0}</TMF.EnergyDrainRate>
+	<TMF.Charges>Charges: {0}</TMF.Charges>
+	<TMF.CurCharges>Charges: {0} / {1}</TMF.CurCharges>
+	<TMF.MaxCharges>Max charges: {0}</TMF.MaxCharges>
+	<TMF.MissingCharges>Missing charges</TMF.MissingCharges>
+	<TMF.AbilityCapacityEffects>{0}: {1}</TMF.AbilityCapacityEffects>
+	<TMF.StatsReport_Abilities>Relevant abilities</TMF.StatsReport_Abilities>
+	<TMF.SkillPointsAvailable>Available skill points: {0}</TMF.SkillPointsAvailable>
+	<TMF.SpentSkillPoints>Spent skill points: {0} / {1}</TMF.SpentSkillPoints>
+	<TMF.AbilityLevel>Level {0} / {1}</TMF.AbilityLevel>
+	<TMF.XPPoints>XP points: {0}</TMF.XPPoints>
+	<TMF.ProgressToNextLevel>Progress to next level: </TMF.ProgressToNextLevel>
+	<TMF.NotUnlocked>Not unlocked</TMF.NotUnlocked>
+	<TMF.CurrentXP>XP: {0} / {1}</TMF.CurrentXP>
+	<TMF.CurrentMastery>Mastery: {0} / {1}</TMF.CurrentMastery>
+	<TMF.CastingAbilityOn>Casting {0} on {1}</TMF.CastingAbilityOn>
+	<TMF.CastingAbility>Casting {0}</TMF.CastingAbility>
+	<TMF.CannotUseThisAbilityWhileOtherIsActive>Cannot use this ability while {0} is active.</TMF.CannotUseThisAbilityWhileOtherIsActive>
+	<TMF.XPGainOnCast>XP gain on cast: {0}</TMF.XPGainOnCast>
+	<TMF.XPGainWhileActive>XP gain while active: {0} per {1}</TMF.XPGainWhileActive>
+	<TMF.MasteryGainWhileActive>Mastery points gain while active: {0} per {1}</TMF.MasteryGainWhileActive>
+	<TMF.RequiresOtherActiveAbility>Requires active ability: {0}</TMF.RequiresOtherActiveAbility>
+	<TMF.RequiresOneOfActiveAbility>Requires at least one active ability: {0}</TMF.RequiresOneOfActiveAbility>
+	<TMF.RequiresAbilityClassLevels>Requires following ability classes: {0} level</TMF.RequiresAbilityClassLevels>
+	<TMF.RequiresAbilityClassLevel>Requires ability class: {0} level</TMF.RequiresAbilityClassLevel>
+	<TMF.RequiresAbilityLevels>Requires following abilities: {0} level</TMF.RequiresAbilityLevels>
+	<TMF.RequiresAbilityLevel>Requires ability: {0} level</TMF.RequiresAbilityLevel>
+	<TMF.RequiresAbility>Requires ability: {0}</TMF.RequiresAbility>
+	<TMF.RequiresAbilities>Requires abilities: {0}</TMF.RequiresAbilities>
+	<TMF.RequiresAbilitiesOneOf>Requires one of following abilities: {0}</TMF.RequiresAbilitiesOneOf>
+	<TMF.RequiresGene>Requires gene: {0}</TMF.RequiresGene>
+	<TMF.RequiresGenes>Requires genes: {0}</TMF.RequiresGenes>
+	<TMF.RequiresTrait>Requires trait: {0}</TMF.RequiresTrait>
+	<TMF.RequiresTraits>Requires traits: {0}</TMF.RequiresTraits>
+	<TMF.RequiresHealthCondition>Requires health condition: {0}</TMF.RequiresHealthCondition>
+	<TMF.RequiresHealthConditions>Requires health conditions: {0}</TMF.RequiresHealthConditions>
+	<TMF.CannotGainWithAbility>Cannot learn with {0} ability</TMF.CannotGainWithAbility>
+	<TMF.RequiresMinAge>Requires mininum age: {0}</TMF.RequiresMinAge>
+	<TMF.SmallUIMode>Small UI mode</TMF.SmallUIMode>
+	<TMF.EnabledAbilities>Enabled abilities:</TMF.EnabledAbilities>
+	<TMF.MinimizeAbilityButtons>Minimize ability buttons</TMF.MinimizeAbilityButtons>
+</LanguageData>
