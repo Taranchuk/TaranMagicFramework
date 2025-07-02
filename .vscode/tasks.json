@@ -13,7 +13,7 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "${workspaceFolder}/1.5/Source/TaranMagicFramework.csproj"
+                "${workspaceFolder}/1.6/Source/TaranMagicFramework.csproj"
             ],
             "problemMatcher": "$msCompile",
             "group": {

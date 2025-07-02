@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ThingDef ParentName="BaseBullet" Name="TMF_BulletAbility_Base" Abstract="True">
+		<thingClass>TaranMagicFramework.Bullet_Ability</thingClass>
+	</ThingDef>
+
+</Defs>

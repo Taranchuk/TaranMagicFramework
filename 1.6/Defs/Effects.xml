@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<TaranMagicFramework.AnimationDef Name="TMF_AnimationMoteBase" Abstract="True">
+		<thingClass>TaranMagicFramework.Mote_Animation</thingClass>
+		<label>Mote</label>
+		<category>Mote</category>
+		<mote>
+			<solidTime>99999999</solidTime>
+		</mote>
+		<graphicData>
+			<graphicClass>TaranMagicFramework.Graphic_Animation</graphicClass>
+			<shaderType>Mote</shaderType>
+			<drawSize>1</drawSize>
+		</graphicData>
+		<altitudeLayer>MoteOverhead</altitudeLayer>
+		<tickerType>Normal</tickerType>
+		<useHitPoints>false</useHitPoints>
+		<isSaveable>true</isSaveable>
+		<rotatable>false</rotatable>
+		<lockToRealTime>true</lockToRealTime>
+		<drawOffscreen>true</drawOffscreen>
+	</TaranMagicFramework.AnimationDef>
+</Defs>
