@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +25,10 @@ namespace TaranMagicFramework
                 {
                     TMagicUtils.Message("Unlocking ability class " + def, pawn);
                 }
+                else
+                {
+                    TMagicUtils.Message("Locking ability class " + def, pawn);
+                }
                 compAbilities.RecheckAbilities();
             }
         }
@@ -37,19 +41,33 @@ namespace TaranMagicFramework
                 return unlockedTrees;
             }
         }
-        public bool TreeUnlocked(AbilityTreeDef abilityTreeDef) => UnlockedTrees.Contains(abilityTreeDef);
+        public bool TreeUnlocked(AbilityTreeDef abilityTreeDef)
+        {
+            return UnlockedTrees.Contains(abilityTreeDef);
+        }
         public void UnlockTree(AbilityTreeDef abilityTreeDef)
         {
-            unlockedTrees.Add(abilityTreeDef);
-            compAbilities.RecheckAbilities();
-            TMagicUtils.Message("Unlocking tree " + abilityTreeDef, pawn);
+            lock (unlockedTrees)
+            {
+                if (unlockedTrees.Contains(abilityTreeDef))
+                {
+                    TMagicUtils.Message($"UnlockTree({abilityTreeDef.defName}): already present in unlockedTrees. unlockedTrees hash {unlockedTrees.GetHashCode()}. | AbilityClass def: {this.def} AbilityClass hash: {this.GetHashCode()} | Tree def: {abilityTreeDef} Tree hash:: {abilityTreeDef.GetHashCode()}", pawn);
+                    return;
+                }
+                unlockedTrees.Add(abilityTreeDef);
+                TMagicUtils.Message($"Unlocking tree {abilityTreeDef.defName}. unlockedTrees now: [{string.Join(", ", unlockedTrees.Select(t => t.defName))}] unlockedTrees hash {unlockedTrees.GetHashCode()} | AbilityClass def: {this.def} AbilityClass hash: {this.GetHashCode()} | Tree def: {abilityTreeDef} Tree hash:: {abilityTreeDef.GetHashCode()}", pawn);
+                compAbilities.RecheckAbilities();
+            }
         }
 
         public void LockTree(AbilityTreeDef abilityTreeDef)
         {
-            unlockedTrees.Remove(abilityTreeDef);
-            TMagicUtils.Message("Locking tree " + abilityTreeDef, pawn);
-            compAbilities.RecheckAbilities();
+            lock (unlockedTrees)
+            {
+                unlockedTrees.Remove(abilityTreeDef);
+                TMagicUtils.Message($"Locking tree {abilityTreeDef.defName}. unlockedTrees now: [{string.Join(", ", unlockedTrees.Select(t => t.defName))}]", pawn);
+                compAbilities.RecheckAbilities();
+            }
         }
 
         public int id;

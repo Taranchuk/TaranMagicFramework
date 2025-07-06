@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace TaranMagicFramework
@@ -366,14 +367,20 @@ namespace TaranMagicFramework
             }
         }
 
-        private bool checking;
+        private int frameChecking;
+        private int curFrame;
         public void TryAutoGainAbilities()
         {
-            if (checking)
+            if (frameChecking >= 3 && curFrame == Time.frameCount)
             {
                 return;
             }
-            checking = true;
+            if (curFrame != Time.frameCount)
+            {
+                frameChecking = 0;
+                curFrame = Time.frameCount;
+            }
+            frameChecking++;
             try
             {
                 CheckForGaining();
@@ -381,10 +388,6 @@ namespace TaranMagicFramework
             catch (Exception e)
             {
                 Log.Error("Error in TryAutoGainAbilities: " + e);
-            }
-            finally
-            {
-                checking = false;
             }
         }
 

@@ -47,6 +47,23 @@ namespace TaranMagicFramework
             }
         }
 
+        public static bool HasActiveGene(this Pawn pawn, GeneDef geneDef)
+        {
+            if (pawn?.genes == null) return false;
+
+            foreach (var gene in pawn.genes.GenesListForReading)
+            {
+                if (gene.def != geneDef) continue;
+
+                if (gene.Active) return true;
+
+                var ext = gene.def.GetModExtension<AbilityExtension>();
+                if (ext != null && ext.countAsActive) return true;
+            }
+
+            return false;
+        }
+
         public static void AddHediffWithoutAbilityExtension(this Pawn pawn, Hediff hediff)
         {
             AbilityExtension.doNotUnlockAbilities = true;

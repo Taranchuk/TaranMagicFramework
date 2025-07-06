@@ -41,7 +41,7 @@ namespace TaranMagicFramework
         public List<GeneticTraitData> forcedTraits;
         public bool customTraitGeneration;
         public bool alwaysHitTarget;
-
+        public bool countAsActive;
         public static bool doNotRemoveAbilities;
         public void RemoveAbilities(Pawn pawn, Def source)
         {
@@ -51,7 +51,7 @@ namespace TaranMagicFramework
             }
             if (doNotRemoveAbilitiesWithGenes != null)
             {
-                if (doNotRemoveAbilitiesWithGenes.Any(x => pawn.genes.HasActiveGene(x)))
+                if (doNotRemoveAbilitiesWithGenes.Any(x => pawn.HasActiveGene(x)))
                 {
                     return;
                 }
@@ -100,6 +100,7 @@ namespace TaranMagicFramework
                     {
                         if (abilityClass.def.abilityTrees.Contains(tree))
                         {
+                            TMagicUtils.Message("Removing ability tree: " + tree, pawn);
                             abilityClass.UnlockedTrees.Remove(tree);
                         }
                     }
@@ -204,7 +205,7 @@ namespace TaranMagicFramework
                     if (!abilityClass.Unlocked)
                     {
                         abilityClass.Unlocked = true;
-                        TMagicUtils.Message(abilityClass.def + " is unlocked", pawn);
+                        TMagicUtils.Message(abilityClass.def + " ability class is unlocked", pawn);
                     }
                     TMagicUtils.Message("comp.AllUnlockedAbilityClasses: " + string.Join(", ", comp.AllUnlockedAbilityClasses.Select(x => x.def)), pawn);
                 }
@@ -255,7 +256,7 @@ namespace TaranMagicFramework
                             if (abilityClass.TreeUnlocked(tree) is false)
                             {
                                 abilityClass.UnlockTree(tree);
-                                TMagicUtils.Message(tree + " is unlocked", pawn);
+                                TMagicUtils.Message(tree + "ability tree is unlocked", pawn);
                             }
                         }
                     }
@@ -322,7 +323,7 @@ namespace TaranMagicFramework
                 {
                     if (abilityTree.AllAbilities.Contains(abilityToLearn.ability))
                     {
-                        if (abilityClass.UnlockedTrees.Contains(abilityTree) is false)
+                        if (abilityClass.TreeUnlocked(abilityTree) is false)
                         {
                             abilityClass.UnlockTree(abilityTree);
                         }

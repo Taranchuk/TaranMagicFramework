@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace TaranMagicFramework
@@ -189,12 +190,11 @@ namespace TaranMagicFramework
                                 {
                                     foreach (var abilityTree in abilityClass.def.abilityTrees)
                                     {
-
                                         foreach (var ability in abilityTree.AllAbilities)
                                         {
                                             if (abilityClass.Learned(ability) is false || abilityClass.FullyLearned(ability) is false)
                                             {
-                                                if (!abilityClass.TreeUnlocked(abilityTree))
+                                                if (abilityClass.TreeUnlocked(abilityTree) is false)
                                                 {
                                                     abilityClass.UnlockTree(abilityTree);
                                                 }
@@ -328,7 +328,7 @@ namespace TaranMagicFramework
             for (int i = abilitySourcesGenes.Count - 1; i >= 0; i--)
             {
                 var source = abilitySourcesGenes[i];
-                if (Pawn.genes.HasActiveGene(source) is false)
+                if (Pawn.HasActiveGene(source) is false)
                 {
                     allSources.Add(source);
                 }
@@ -365,14 +365,22 @@ namespace TaranMagicFramework
                 }
             }
         }
-        private bool checking;
+
+        private int frameChecking;
+        private int curFrame;
         public void TryAutoGainAbilities()
         {
-            if (checking)
+            if (frameChecking >= 5 && curFrame == Time.frameCount)
             {
+                TMagicUtils.Message("TryAutoGainAbilities: Already checked this frame, skipping to prevent lag.", Pawn);
                 return;
             }
-            checking = true;
+            if (curFrame != Time.frameCount)
+            {
+                frameChecking = 0;
+                curFrame = Time.frameCount;
+            }
+            frameChecking++;
             try
             {
                 CheckForGaining();
@@ -380,10 +388,6 @@ namespace TaranMagicFramework
             catch (Exception e)
             {
                 Log.Error("Error in TryAutoGainAbilities: " + e);
-            }
-            finally
-            {
-                checking = false;
             }
         }
 
@@ -437,9 +441,12 @@ namespace TaranMagicFramework
                 foreach (var gene in Pawn.genes.GenesListForReading)
                 {
                     var geneExtension = gene.def.GetModExtension<AbilityExtension>();
-                    if (geneExtension != null && abilitySourcesGenes.Contains(gene.def) is false)
+                    if (geneExtension != null && (gene.Active || geneExtension.countAsActive))
                     {
-                        allSources.Add(gene.def);
+                        if (abilitySourcesGenes.Contains(gene.def) is false)
+                        {
+                            allSources.Add(gene.def);
+                        }
                     }
                 }
             }
