@@ -366,7 +366,29 @@ namespace TaranMagicFramework
             }
         }
 
+        private bool checking;
         public void TryAutoGainAbilities()
+        {
+            if (checking)
+            {
+                return;
+            }
+            checking = true;
+            try
+            {
+                CheckForGaining();
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error in TryAutoGainAbilities: " + e);
+            }
+            finally
+            {
+                checking = false;
+            }
+        }
+
+        private void CheckForGaining()
         {
             var allSources = new List<Def>();
             if (Pawn.story?.traits != null)
