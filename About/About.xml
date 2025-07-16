@@ -3,7 +3,7 @@
     <name>TaranMagicFramework</name>
     <author>Taranchuk</author>
     <packageId>Taranchuk.TaranMagicFramework</packageId>
-    <description>This mod contains all the necessary files for the magic framework system.</description>
+    <description>This mod contains all the necessary code for the magic framework system.</description>
     <supportedVersions>
         <li>1.5</li>
             <li>1.6</li>
@@ -11,8 +11,10 @@
     <loadAfter>
         <li>Ludeon.RimWorld</li>
         <li>Ludeon.RimWorld.Royalty</li>
+        <li>Ludeon.RimWorld.Ideology</li>
         <li>Ludeon.RimWorld.Biotech</li>
         <li>Ludeon.RimWorld.Anomaly</li>
+        <li>Ludeon.RimWorld.Odyssey</li>
         <li>brrainz.harmony</li>
     </loadAfter>
 </ModMetaData>
