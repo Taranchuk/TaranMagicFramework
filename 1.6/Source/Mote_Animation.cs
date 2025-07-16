@@ -172,7 +172,11 @@ namespace TaranMagicFramework
             base.Tick();
             if (!Destroyed)
             {
-                if (destroy && expireInTick <= 0)
+                if (link1.Target.Thing is not null && link1.Target.Map is null)
+                {
+                    Destroy();
+                }
+                else if (destroy && expireInTick <= 0)
                 {
                     Destroy();
                 }

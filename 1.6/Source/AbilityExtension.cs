@@ -88,7 +88,14 @@ namespace TaranMagicFramework
                 foreach (var abilityClassDef in abilityClasses)
                 {
                     TMagicUtils.Message("Removing ability class: " + abilityClassDef, pawn);
-                    comp.abilityClasses.Remove(abilityClassDef);
+                    if (comp.abilityClasses.TryGetValue(abilityClassDef, out var value))
+                    {
+                        foreach (var ability in value.LearnedAbilities.ToList())
+                        {
+                            value.RemoveAbility(ability);
+                        }
+                        comp.abilityClasses.Remove(abilityClassDef);
+                    }
                 }
             }
 
