@@ -499,7 +499,7 @@ namespace TaranMagicFramework
                     animation.Destroy();
                 }
             }
-            animations.RemoveAll(x => x.Destroyed);
+            animations.RemoveAll(x => x is null || x.Destroyed);
             pawn.ResolveAllGraphicsSafely();
         }
 
