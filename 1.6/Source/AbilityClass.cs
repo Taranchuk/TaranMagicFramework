@@ -103,8 +103,15 @@ namespace TaranMagicFramework
 
         public Ability GetLearnedAbility(AbilityDef abilityDef)
         {
-            if (abilityDef == null) return null;
-            return learnedAbilities.ContainsKey(abilityDef) ? learnedAbilities[abilityDef] : null;
+            if (abilityDef == null)
+            {
+                return null;
+            }
+            if (!learnedAbilities.TryGetValue(abilityDef, out var ability))
+            {
+                return null;
+            }
+            return ability;
         }
 
         public virtual Ability LearnAbility(AbilityDef abilityDef, bool spendSkillPoints, int level = 0)

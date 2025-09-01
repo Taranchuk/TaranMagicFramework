@@ -211,17 +211,15 @@ namespace TaranMagicFramework
         {
             if (__instance.Dead)
             {
-                foreach (var comp in __instance.AllComps.OfType<CompAbilities>())
+                var comp = __instance.GetComp<CompAbilities>();
+                if (comp != null)
                 {
-                    if (comp != null)
+                    foreach (var ability in comp.AllLearnedAbilities)
                     {
-                        foreach (var ability in comp.AllLearnedAbilities)
+                        ability.Notify_CasterKilled();
+                        if (ability.Active)
                         {
-                            ability.Notify_CasterKilled();
-                            if (ability.Active)
-                            {
-                                ability.End();
-                            }
+                            ability.End();
                         }
                     }
                 }
@@ -236,24 +234,22 @@ namespace TaranMagicFramework
         {
             if (___pawn.Downed && hediff?.def != HediffDefOf.Anesthetic)
             {
-                foreach (var comp in ___pawn.AllComps.OfType<CompAbilities>())
+                var comp = ___pawn.GetComp<CompAbilities>();
+                if (comp != null && ___pawn.health.hediffSet.hediffs.Any(x => x is Hediff_Injury))
                 {
-                    if (comp != null && ___pawn.health.hediffSet.hediffs.Any(x => x is Hediff_Injury))
+                    foreach (var ability in comp.AllLearnedAbilities)
                     {
-                        foreach (var ability in comp.AllLearnedAbilities)
+                        ability.Notify_CasterDowned();
+                        if (ability.Active)
                         {
-                            ability.Notify_CasterDowned();
-                            if (ability.Active)
-                            {
-                                ability.End();
-                            }
+                            ability.End();
                         }
                     }
                 }
             }
         }
     }
-    
+
     [HarmonyPatch(typeof(StatWorker), "GetValueUnfinalized")]
     public static class StatWorker_GetValueUnfinalized_Patch
     {
@@ -296,16 +292,28 @@ namespace TaranMagicFramework
 
             float totalOffset = 0f;
             float totalFactor = 1f;
-
-            foreach (var thingComp in pawn.AllComps)
+            var comp = pawn.GetComp<CompAbilities>();
+            if (comp != null)
             {
-                if (thingComp is CompAbilities comp)
+                foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
                 {
-                    foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
+                    if (abilityClass.def.statBonusesPerLevel != null)
                     {
-                        if (abilityClass.def.statBonusesPerLevel != null)
+                        foreach (var entry in abilityClass.def.statBonusesPerLevel)
                         {
-                            foreach (var entry in abilityClass.def.statBonusesPerLevel)
+                            if (abilityClass.level >= entry.minLevel)
+                            {
+                                totalOffset += entry.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                                totalFactor *= entry.statFactors?.GetStatFactorFromList(stat) ?? 1f;
+                            }
+                        }
+                    }
+
+                    foreach (var abilityTree in abilityClass.UnlockedTrees)
+                    {
+                        if (abilityTree.statBonusesPerLevel != null)
+                        {
+                            foreach (var entry in abilityTree.statBonusesPerLevel)
                             {
                                 if (abilityClass.level >= entry.minLevel)
                                 {
@@ -314,33 +322,18 @@ namespace TaranMagicFramework
                                 }
                             }
                         }
-
-                        foreach (var abilityTree in abilityClass.UnlockedTrees)
-                        {
-                            if (abilityTree.statBonusesPerLevel != null)
-                            {
-                                foreach (var entry in abilityTree.statBonusesPerLevel)
-                                {
-                                    if (abilityClass.level >= entry.minLevel)
-                                    {
-                                        totalOffset += entry.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
-                                        totalFactor *= entry.statFactors?.GetStatFactorFromList(stat) ?? 1f;
-                                    }
-                                }
-                            }
-                        }
                     }
+                }
 
-                    foreach (var ability in comp.AllLearnedAbilities)
+                foreach (var ability in comp.AllLearnedAbilities)
+                {
+                    var abilityTier = ability.AbilityTier;
+                    totalOffset += abilityTier.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                    totalFactor *= abilityTier.statFactors?.GetStatFactorFromList(stat) ?? 1f;
+
+                    if (stat == StatDefOf.MoveSpeed && ability.Active && abilityTier.movementSpeedFactor != -1f)
                     {
-                        var abilityTier = ability.AbilityTier;
-                        totalOffset += abilityTier.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
-                        totalFactor *= abilityTier.statFactors?.GetStatFactorFromList(stat) ?? 1f;
-
-                        if (stat == StatDefOf.MoveSpeed && ability.Active && abilityTier.movementSpeedFactor != -1f)
-                        {
-                            totalFactor *= abilityTier.movementSpeedFactor;
-                        }
+                        totalFactor *= abilityTier.movementSpeedFactor;
                     }
                 }
             }
@@ -389,10 +382,12 @@ namespace TaranMagicFramework
             Pawn pawn = req.Thing as Pawn;
             if (pawn != null)
             {
-                foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
+                var comp = pawn.GetComp<CompAbilities>();
+                if (comp != null)
                 {
                     if (comp != null)
                     {
+
                         foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
                         {
                             if (abilityClass.def.statBonusesPerLevel != null)
@@ -477,38 +472,36 @@ namespace TaranMagicFramework
     {
         public static void Postfix(ref float __result, HediffSet diffSet, PawnCapacityDef capacity, List<CapacityImpactor> impactors = null, bool forTradePrice = false)
         {
-            foreach (var comp in diffSet.pawn.AllComps.OfType<CompAbilities>())
+            var comp = diffSet.pawn.GetComp<CompAbilities>();
+            if (comp != null)
             {
-                if (comp != null)
+                foreach (var ability in comp.AllLearnedAbilities)
                 {
-                    foreach (var ability in comp.AllLearnedAbilities)
+                    if (ability.AbilityTier.capMods != null)
                     {
-                        if (ability.AbilityTier.capMods != null)
+                        var pawnCapacityModifier = ability.AbilityTier.capMods.FirstOrDefault(x => x.capacity == capacity);
+                        if (pawnCapacityModifier != null)
                         {
-                            var pawnCapacityModifier = ability.AbilityTier.capMods.FirstOrDefault(x => x.capacity == capacity);
-                            if (pawnCapacityModifier != null)
+                            impactors?.Add(new CapacityImpactorAbility
                             {
-                                impactors?.Add(new CapacityImpactorAbility
+                                capacity = capacity,
+                                ability = ability,
+                            });
+                            var sb = new StringBuilder();
+                            if (pawnCapacityModifier.offset != 0f)
+                            {
+                                __result += pawnCapacityModifier.offset;
+                            }
+                            if (pawnCapacityModifier.postFactor != 1f)
+                            {
+                                __result *= pawnCapacityModifier.postFactor;
+                            }
+                            if (pawnCapacityModifier.setMax != 999f)
+                            {
+                                float maxValue = pawnCapacityModifier.EvaluateSetMax(diffSet.pawn);
+                                if (maxValue < __result)
                                 {
-                                    capacity = capacity,
-                                    ability = ability,
-                                });
-                                var sb = new StringBuilder();
-                                if (pawnCapacityModifier.offset != 0f)
-                                {
-                                    __result += pawnCapacityModifier.offset;
-                                }
-                                if (pawnCapacityModifier.postFactor != 1f)
-                                {
-                                    __result *= pawnCapacityModifier.postFactor;
-                                }
-                                if (pawnCapacityModifier.setMax != 999f)
-                                {
-                                    float maxValue = pawnCapacityModifier.EvaluateSetMax(diffSet.pawn);
-                                    if (maxValue < __result)
-                                    {
-                                        __result = maxValue;
-                                    }
+                                    __result = maxValue;
                                 }
                             }
                         }

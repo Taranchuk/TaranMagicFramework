@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,7 @@ namespace TaranMagicFramework
             }
         }
         private static Dictionary<AbilityTabDef, InspectTabBase> sharedInstances = new Dictionary<AbilityTabDef, InspectTabBase>();
+        private static Dictionary<Pawn, Dictionary<AbilityDef, AbilityClass>> abilityClassCache = new Dictionary<Pawn, Dictionary<AbilityDef, AbilityClass>>();
         static TMagicUtils()
         {
             foreach (var statDef in DefDatabase<StatDef>.AllDefs)
@@ -301,13 +302,31 @@ namespace TaranMagicFramework
 
         public static Ability GetAbility(this Pawn pawn, AbilityDef abilityDef)
         {
-            foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
+            if (!abilityClassCache.TryGetValue(pawn, out var pawnCache))
+            {
+                abilityClassCache[pawn] = pawnCache = new Dictionary<AbilityDef, AbilityClass>();
+            }
+            if (pawnCache.TryGetValue(abilityDef, out var cachedAbilityClass))
+            {
+                var ability = cachedAbilityClass.GetLearnedAbility(abilityDef);
+                if (ability != null)
+                {
+                    return ability;
+                }
+                else
+                {
+                    pawnCache[abilityDef] = null;
+                }
+            }
+            var comp = pawn.GetComp<CompAbilities>();
+            if (comp != null)
             {
                 foreach (var abilityClass in comp.abilityClasses.Values)
                 {
                     var ability = abilityClass.GetLearnedAbility(abilityDef);
                     if (ability != null)
                     {
+                        pawnCache[abilityDef] = abilityClass;
                         return ability;
                     }
                 }
@@ -317,7 +336,8 @@ namespace TaranMagicFramework
 
         public static bool HasActiveAbility(this Pawn pawn, AbilityDef abilityDef)
         {
-            foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
+            var comp = pawn.GetComp<CompAbilities>();
+            if (comp != null)
             {
                 foreach (var abilityClass in comp.abilityClasses.Values)
                 {
