@@ -1,6 +1,7 @@
 using HarmonyLib;
 using RimWorld;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -26,7 +27,7 @@ namespace TaranMagicFramework
             }
         }
         private static Dictionary<AbilityTabDef, InspectTabBase> sharedInstances = new Dictionary<AbilityTabDef, InspectTabBase>();
-        private static Dictionary<Pawn, Dictionary<AbilityDef, AbilityClass>> abilityClassCache = new Dictionary<Pawn, Dictionary<AbilityDef, AbilityClass>>();
+        private static ConcurrentDictionary<Pawn, ConcurrentDictionary<AbilityDef, AbilityClass>> abilityClassCache = new ();
         static TMagicUtils()
         {
             foreach (var statDef in DefDatabase<StatDef>.AllDefs)
@@ -304,7 +305,7 @@ namespace TaranMagicFramework
         {
             if (!abilityClassCache.TryGetValue(pawn, out var pawnCache))
             {
-                abilityClassCache[pawn] = pawnCache = new Dictionary<AbilityDef, AbilityClass>();
+                abilityClassCache[pawn] = pawnCache = new();
             }
             if (pawnCache.TryGetValue(abilityDef, out var cachedAbilityClass))
             {
