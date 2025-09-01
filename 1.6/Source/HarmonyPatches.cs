@@ -1,6 +1,7 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using RimWorld;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -252,174 +253,126 @@ namespace TaranMagicFramework
             }
         }
     }
-
-    [HarmonyPatch(typeof(StatExtension), nameof(StatExtension.GetStatValue))]
-    public static class StatExtension_GetStatValue_Patch
+    
+    [HarmonyPatch(typeof(StatWorker), "GetValueUnfinalized")]
+    public static class StatWorker_GetValueUnfinalized_Patch
     {
-        private static void Postfix(Thing thing, StatDef stat, bool applyPostProcess, ref float __result)
+        private class StatBonusCacheEntry
         {
-            if (thing is Pawn pawn)
+            public float offset;
+            public float factor;
+            public int tick;
+        }
+
+        private static readonly ConcurrentDictionary<(Pawn, StatDef), StatBonusCacheEntry> _statBonusCache = new ConcurrentDictionary<(Pawn, StatDef), StatBonusCacheEntry>();
+
+        public static void ApplyOffsets(ref float __result, StatWorker __instance, StatRequest req)
+        {
+            if (req.Thing is Pawn pawn)
             {
-                if (stat == StatDefOf.MoveSpeed)
+                var (offset, _) = GetOrCalculateStatBonuses(pawn, __instance.stat);
+                __result += offset;
+            }
+        }
+
+        public static void Postfix(ref float __result, StatWorker __instance, StatRequest req)
+        {
+            if (req.Thing is Pawn pawn)
+            {
+                var (_, factor) = GetOrCalculateStatBonuses(pawn, __instance.stat);
+                __result *= factor;
+            }
+        }
+
+        private static (float offset, float factor) GetOrCalculateStatBonuses(Pawn pawn, StatDef stat)
+        {
+            int currentTick = Find.TickManager.TicksGame;
+            var cacheKey = (pawn, stat);
+
+            if (_statBonusCache.TryGetValue(cacheKey, out StatBonusCacheEntry cachedEntry) && currentTick - cachedEntry.tick < 60)
+            {
+                return (cachedEntry.offset, cachedEntry.factor);
+            }
+
+            float totalOffset = 0f;
+            float totalFactor = 1f;
+
+            foreach (var thingComp in pawn.AllComps)
+            {
+                if (thingComp is CompAbilities comp)
                 {
-                    foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
+                    foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
                     {
-                        if (comp != null)
+                        if (abilityClass.def.statBonusesPerLevel != null)
                         {
-                            foreach (var ability in comp.AllLearnedAbilities)
+                            foreach (var entry in abilityClass.def.statBonusesPerLevel)
                             {
-                                if (ability.Active)
+                                if (abilityClass.level >= entry.minLevel)
                                 {
-                                    var abilityTier = ability.AbilityTier;
-                                    if (abilityTier.movementSpeedFactor != -1)
+                                    totalOffset += entry.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                                    totalFactor *= entry.statFactors?.GetStatFactorFromList(stat) ?? 1f;
+                                }
+                            }
+                        }
+
+                        foreach (var abilityTree in abilityClass.UnlockedTrees)
+                        {
+                            if (abilityTree.statBonusesPerLevel != null)
+                            {
+                                foreach (var entry in abilityTree.statBonusesPerLevel)
+                                {
+                                    if (abilityClass.level >= entry.minLevel)
                                     {
-                                        __result *= abilityTier.movementSpeedFactor;
+                                        totalOffset += entry.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                                        totalFactor *= entry.statFactors?.GetStatFactorFromList(stat) ?? 1f;
                                     }
                                 }
                             }
                         }
                     }
+
+                    foreach (var ability in comp.AllLearnedAbilities)
+                    {
+                        var abilityTier = ability.AbilityTier;
+                        totalOffset += abilityTier.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                        totalFactor *= abilityTier.statFactors?.GetStatFactorFromList(stat) ?? 1f;
+
+                        if (stat == StatDefOf.MoveSpeed && ability.Active && abilityTier.movementSpeedFactor != -1f)
+                        {
+                            totalFactor *= abilityTier.movementSpeedFactor;
+                        }
+                    }
                 }
             }
-        }
-    }
 
-    [HarmonyPatch(typeof(StatWorker), "GetValueUnfinalized")]
-    public static class StatWorker_GetValueUnfinalized_Patch
-    {
-        public static void Postfix(ref float __result, StatWorker __instance, StatRequest req)
-        {
-            SetFactors(ref __result, __instance, req);
-        }
-
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
-        {
-            var codes = codeInstructions.ToList();
-            var setOffsets = AccessTools.Method(typeof(StatWorker_GetValueUnfinalized_Patch), "SetOffsets");
-            bool patched = false;
-            for (var i = 0; i < codes.Count; i++)
+            var newEntry = new StatBonusCacheEntry
             {
-                var code = codes[i];
-                yield return code;
+                offset = totalOffset,
+                factor = totalFactor,
+                tick = currentTick
+            };
+
+            _statBonusCache[cacheKey] = newEntry;
+            return (newEntry.offset, newEntry.factor);
+        }
+
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = instructions.ToList();
+            var applyOffsetsMethod = AccessTools.Method(typeof(StatWorker_GetValueUnfinalized_Patch), nameof(ApplyOffsets));
+            bool patched = false;
+
+            for (int i = 0; i < codes.Count; i++)
+            {
+                yield return codes[i];
+
                 if (!patched && i > 1 && codes[i].opcode == OpCodes.Brfalse && codes[i - 1].opcode == OpCodes.Ldloc_1)
                 {
                     yield return new CodeInstruction(OpCodes.Ldloca_S, 0);
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
-                    yield return new CodeInstruction(OpCodes.Ldarg_S, 1);
-                    yield return new CodeInstruction(OpCodes.Call, setOffsets);
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
+                    yield return new CodeInstruction(OpCodes.Call, applyOffsetsMethod);
                     patched = true;
-                }
-            }
-        }
-
-        public static void SetOffsets(ref float __result, StatWorker __instance, StatRequest req)
-        {
-            Pawn pawn = req.Thing as Pawn;
-            if (pawn != null)
-            {
-                foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
-                {
-                    if (comp != null)
-                    {
-                        foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
-                        {
-                            if (abilityClass.def.statBonusesPerLevel != null)
-                            {
-                                foreach (var entry in abilityClass.def.statBonusesPerLevel)
-                                {
-                                    if (abilityClass.level >= entry.minLevel)
-                                    {
-                                        if (entry.statOffsets != null)
-                                        {
-                                            __result += entry.statOffsets.GetStatOffsetFromList(__instance.stat);
-                                        }
-                                    }
-                                }
-                            }
-
-                            foreach (var abilityTree in abilityClass.UnlockedTrees)
-                            {
-                                if (abilityTree.statBonusesPerLevel != null)
-                                {
-                                    foreach (var entry in abilityTree.statBonusesPerLevel)
-                                    {
-                                        if (abilityClass.level >= entry.minLevel)
-                                        {
-                                            if (entry.statOffsets != null)
-                                            {
-                                                __result += entry.statOffsets.GetStatOffsetFromList(__instance.stat);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        foreach (var ability in comp.AllLearnedAbilities)
-                        {
-                            var abilityTier = ability.AbilityTier;
-                            if (abilityTier.statOffsets != null)
-                            {
-                                __result += abilityTier.statOffsets.GetStatOffsetFromList(__instance.stat);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private static void SetFactors(ref float __result, StatWorker __instance, StatRequest req)
-        {
-            Pawn pawn = req.Thing as Pawn;
-            if (pawn != null)
-            {
-                foreach (var comp in pawn.AllComps.OfType<CompAbilities>())
-                {
-                    if (comp != null)
-                    {
-                        foreach (var abilityClass in comp.AllUnlockedAbilityClasses)
-                        {
-                            if (abilityClass.def.statBonusesPerLevel != null)
-                            {
-                                foreach (var entry in abilityClass.def.statBonusesPerLevel)
-                                {
-                                    if (abilityClass.level >= entry.minLevel)
-                                    {
-                                        if (entry.statFactors != null)
-                                        {
-                                            __result *= entry.statFactors.GetStatFactorFromList(__instance.stat);
-                                        }
-                                    }
-                                }
-                            }
-
-                            foreach (var abilityTree in abilityClass.UnlockedTrees)
-                            {
-                                if (abilityTree.statBonusesPerLevel != null)
-                                {
-                                    foreach (var entry in abilityTree.statBonusesPerLevel)
-                                    {
-                                        if (abilityClass.level >= entry.minLevel)
-                                        {
-                                            if (entry.statFactors != null)
-                                            {
-                                                __result *= entry.statFactors.GetStatFactorFromList(__instance.stat);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        foreach (var ability in comp.AllLearnedAbilities)
-                        {
-                            var abilityTier = ability.AbilityTier;
-                            if (abilityTier.statFactors != null)
-                            {
-                                __result *= abilityTier.statFactors.GetStatFactorFromList(__instance.stat);
-                            }
-                        }
-                    }
                 }
             }
         }
