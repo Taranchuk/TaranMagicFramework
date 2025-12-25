@@ -36,6 +36,7 @@ namespace TaranMagicFramework
 
         public List<AbilityClassLevelRequirement> requiredMinimumLevels;
         public List<AbilityLevelRequirement> requiredMinimumAbilityLevels;
+        public List<SkillRequirement> requiredMinimumSkillLevels;
 
         public int skillPointsToUnlock;
 
@@ -108,6 +109,19 @@ namespace TaranMagicFramework
                 else
                 {
                     failReason ??= "TMF.RequiresAbilityLevel".Translate(requiredMinimumAbilityLevels[0].ability.label + ": " + requiredMinimumLevels[0].minLevel + 1);
+                }
+                return false;
+            }
+            if (requiredMinimumSkillLevels != null && !requiredMinimumSkillLevels
+                .All(x => abilityClass.pawn.skills?.GetSkill(x.skill)?.Level >= x.minLevel))
+            {
+                if (requiredMinimumSkillLevels.Count > 1)
+                {
+                    failReason ??= "TMF.RequiresSkillLevels".Translate(string.Join(", ", requiredMinimumSkillLevels.Select(x => x.skill.label + ": " + x.minLevel)));
+                }
+                else
+                {
+                    failReason ??= "TMF.RequiresSkillLevel".Translate(requiredMinimumSkillLevels[0].skill.label + ": " + requiredMinimumSkillLevels[0].minLevel);
                 }
                 return false;
             }

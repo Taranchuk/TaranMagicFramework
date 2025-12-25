@@ -60,4 +60,6 @@
 	<TMF.SmallUIMode>Small UI mode</TMF.SmallUIMode>
 	<TMF.EnabledAbilities>Enabled abilities:</TMF.EnabledAbilities>
 	<TMF.MinimizeAbilityButtons>Minimize ability buttons</TMF.MinimizeAbilityButtons>
+	<TMF.RequiresSkillLevels>Requires following skills: {0} level</TMF.RequiresSkillLevels>
+	<TMF.RequiresSkillLevel>Requires skill: {0} level</TMF.RequiresSkillLevel>
 </LanguageData>

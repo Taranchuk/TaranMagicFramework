@@ -1,4 +1,9 @@
 {
     "dotnet.preferCSharpExtension": true,
-    "dotnet.defaultSolution": "1.6/Source/TaranMagicFramework.sln"
+    "dotnet.defaultSolution": "1.6/Source/TaranMagicFramework.sln",
+    "files.exclude": {
+        "1.3/": true,
+        "1.4/": true,
+        "1.5/": true
+    }
 }
