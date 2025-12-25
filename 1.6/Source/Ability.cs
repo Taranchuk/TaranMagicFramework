@@ -165,6 +165,13 @@ namespace TaranMagicFramework
                         return false;
                     }
                 }
+                if (AbilityTier.visibleWithHediffs.NullOrEmpty() is false)
+                {
+                    if (AbilityTier.visibleWithHediffs.Any(x => pawn.health.hediffSet.GetFirstHediffOfDef(x) == null))
+                    {
+                        return false;
+                    }
+                }
                 return true;
             }
         }

@@ -73,6 +73,7 @@ namespace TaranMagicFramework
         public bool activateOnGain;
         public List<HediffDef> cannotBeActiveWithHediffs;
         public List<HediffDef> hideWithHediffs;
+        public List<HediffDef> visibleWithHediffs;
         public List<AbilityDef> cannotBeActiveWithOtherAbilitiesInUse;
         public List<AbilityDef> hideWithAbilities;
         public List<AbilityDef> requiresActiveAbilities;
