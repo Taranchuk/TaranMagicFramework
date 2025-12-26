@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -10,10 +10,9 @@ namespace TaranMagicFramework
         public AbilityResourceDef def;
         public CompAbilities compAbilities;
         public int id;
-
         public float energy;
         public float EnergyPct => energy / MaxEnergy;
-        public int MaxEnergy => (int)TMagicUtils.GetStatValueForStat(compAbilities, def.maxEnergyStat);
+        public int MaxEnergy => Mathf.Max(0, (int)TMagicUtils.GetStatValueForStat(compAbilities, def.maxEnergyStat));
         public virtual int EnergyFillTickInterval => 60;
         public virtual void Tick()
         {
