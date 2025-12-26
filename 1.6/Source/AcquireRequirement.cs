@@ -50,6 +50,8 @@ namespace TaranMagicFramework
 
         public List<TraitDef> requiredTraits;
 
+        public List<TraitDef> requiredTraitsOneOf;
+
         public List<HediffDef> requiredHediffs;
 
         public int minHediffCount = 1;
@@ -154,6 +156,11 @@ namespace TaranMagicFramework
             if (requiredTraits != null && !requiredTraits.All(x => abilityClass.pawn.story?.traits?.HasTrait(x) ?? false))
             {
                 failReason ??= RequiresDefs(requiredTraits.Cast<Def>().ToList(), "TMF.RequiresTrait", "TMF.RequiresTraits");
+                return false;
+            }
+            if (requiredTraitsOneOf != null && !requiredTraitsOneOf.Any(x => abilityClass.pawn.story?.traits?.HasTrait(x) ?? false))
+            {
+                failReason ??= RequiresDefs(requiredTraitsOneOf.Cast<Def>().ToList(), "TMF.RequiresTrait", "TMF.RequiresTraitsOneOf");
                 return false;
             }
             if (minAge != -1 && abilityClass.pawn.ageTracker.AgeBiologicalYearsFloat < minAge)

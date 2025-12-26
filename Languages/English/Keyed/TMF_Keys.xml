@@ -53,6 +53,7 @@
 	<TMF.RequiresGenes>Requires genes: {0}</TMF.RequiresGenes>
 	<TMF.RequiresTrait>Requires trait: {0}</TMF.RequiresTrait>
 	<TMF.RequiresTraits>Requires traits: {0}</TMF.RequiresTraits>
+	<TMF.RequiresTraitsOneOf>Requires one of following traits: {0}</TMF.RequiresTraitsOneOf>
 	<TMF.RequiresHealthCondition>Requires health condition: {0}</TMF.RequiresHealthCondition>
 	<TMF.RequiresHealthConditions>Requires health conditions: {0}</TMF.RequiresHealthConditions>
 	<TMF.CannotGainWithAbility>Cannot learn with {0} ability</TMF.CannotGainWithAbility>
