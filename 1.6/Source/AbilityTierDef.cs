@@ -1,6 +1,7 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -175,9 +176,30 @@ namespace TaranMagicFramework
             {
                 ability.SpawnItem(thingToSpawn);
             }
+
             if (hediffProps != null)
             {
-                ability.AddHediff(hediffProps);
+                if (AOERadius > 0)
+                {
+                    var center = ability.curTarget.IsValid ? ability.curTarget.Cell : ability.pawn.Position;
+                    var map = ability.pawn.Map;
+                    if (map != null)
+                    {
+                        var pawns = GenRadial.RadialDistinctThingsAround(center, map, AOERadius, true).OfType<Pawn>();
+                        foreach (var p in pawns)
+                        {
+                            if (targetingParameters != null && !targetingParameters.CanTarget(new TargetInfo(p)))
+                            {
+                                continue;
+                            }
+                            ability.AddHediff(hediffProps, p);
+                        }
+                    }
+                }
+                else
+                {
+                    ability.AddHediff(hediffProps);
+                }
             }
 
             if (ability.pawn.MapHeld != null && overlayProps != null && overlayProps.overlayOnStart)
