@@ -420,5 +420,14 @@ namespace TaranMagicFramework
         }
 
         public Texture2D icon;
+
+        public override void ResolveReferences()
+        {
+            base.ResolveReferences();
+            if (acquireRequirement != null)
+            {
+                acquireRequirement.def = this;
+            }
+        }
     }
 }

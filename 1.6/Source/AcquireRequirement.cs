@@ -32,8 +32,8 @@ namespace TaranMagicFramework
 
     public class AcquireRequirement
     {
+        public AbilityTierDef def;
         public int minLevel;
-
         public List<AbilityClassLevelRequirement> requiredMinimumLevels;
         public List<AbilityLevelRequirement> requiredMinimumAbilityLevels;
         public List<SkillRequirement> requiredMinimumSkillLevels;
@@ -62,7 +62,16 @@ namespace TaranMagicFramework
 
         public bool RequirementSatisfied(AbilityClass abilityClass, Ability ability)
         {
-            return RequirementSatisfied(abilityClass, ability, out _);
+            var result = RequirementSatisfied(abilityClass, ability, out var reason);
+            if (result is false)
+            {
+                TMagicUtils.Message(abilityClass.pawn + " - cannot gain " + def + " because of " + reason);
+            }
+            else if (def.autoGain is false)
+            {
+                TMagicUtils.Message(abilityClass.pawn + " - should gain " + def + " with autoGain set to false, so it can be learned via other means only");
+            }
+            return result;
         }
 
         public bool RequirementSatisfied(AbilityClass abilityClass, Ability ability, out string failReason)

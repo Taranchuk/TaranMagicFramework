@@ -327,13 +327,16 @@ namespace TaranMagicFramework
 
                 foreach (var ability in comp.AllLearnedAbilities)
                 {
-                    var abilityTier = ability.AbilityTier;
-                    totalOffset += abilityTier.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
-                    totalFactor *= abilityTier.statFactors?.GetStatFactorFromList(stat) ?? 1f;
-
-                    if (stat == StatDefOf.MoveSpeed && ability.Active && abilityTier.movementSpeedFactor != -1f)
+                    if (ability.Active)
                     {
-                        totalFactor *= abilityTier.movementSpeedFactor;
+                        var abilityTier = ability.AbilityTier;
+                        totalOffset += abilityTier.statOffsets?.GetStatOffsetFromList(stat) ?? 0f;
+                        totalFactor *= abilityTier.statFactors?.GetStatFactorFromList(stat) ?? 1f;
+
+                        if (stat == StatDefOf.MoveSpeed && ability.Active && abilityTier.movementSpeedFactor != -1f)
+                        {
+                            totalFactor *= abilityTier.movementSpeedFactor;
+                        }
                     }
                 }
             }
@@ -440,18 +443,21 @@ namespace TaranMagicFramework
 
                         foreach (var ability in comp.AllLearnedAbilities)
                         {
-                            var abilityTier = ability.AbilityTier;
-                            if (abilityTier.statOffsets != null && abilityTier.statOffsets.Exists(x => x.stat == __instance.stat))
+                            if (ability.Active)
                             {
-                                hasAbilityModifiers = true;
-                                string valueToStringAsOffset = abilityTier.statOffsets.First((StatModifier se) => se.stat == __instance.stat).ValueToStringAsOffset;
-                                explanation.AppendLine("    " + ability.AbilityLabel() + ": " + valueToStringAsOffset);
-                            }
-                            if (abilityTier.statFactors != null && abilityTier.statFactors.Exists(x => x.stat == __instance.stat))
-                            {
-                                hasAbilityModifiers = true;
-                                string toStringAsFactor = abilityTier.statFactors.First((StatModifier se) => se.stat == __instance.stat).ToStringAsFactor;
-                                explanation.AppendLine("    " + ability.AbilityLabel() + ": " + toStringAsFactor);
+                                var abilityTier = ability.AbilityTier;
+                                if (abilityTier.statOffsets != null && abilityTier.statOffsets.Exists(x => x.stat == __instance.stat))
+                                {
+                                    hasAbilityModifiers = true;
+                                    string valueToStringAsOffset = abilityTier.statOffsets.First((StatModifier se) => se.stat == __instance.stat).ValueToStringAsOffset;
+                                    explanation.AppendLine("    " + ability.AbilityLabel() + ": " + valueToStringAsOffset);
+                                }
+                                if (abilityTier.statFactors != null && abilityTier.statFactors.Exists(x => x.stat == __instance.stat))
+                                {
+                                    hasAbilityModifiers = true;
+                                    string toStringAsFactor = abilityTier.statFactors.First((StatModifier se) => se.stat == __instance.stat).ToStringAsFactor;
+                                    explanation.AppendLine("    " + ability.AbilityLabel() + ": " + toStringAsFactor);
+                                }
                             }
                         }
                     }
@@ -477,7 +483,7 @@ namespace TaranMagicFramework
             {
                 foreach (var ability in comp.AllLearnedAbilities)
                 {
-                    if (ability.AbilityTier.capMods != null)
+                    if (ability.Active && ability.AbilityTier.capMods != null)
                     {
                         var pawnCapacityModifier = ability.AbilityTier.capMods.FirstOrDefault(x => x.capacity == capacity);
                         if (pawnCapacityModifier != null)
