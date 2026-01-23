@@ -72,7 +72,23 @@ namespace TaranMagicFramework
 
         public int id;
         public Pawn pawn;
-        public int MaxLevel => def.maxLevel;
+        public int MaxLevel
+        {
+            get
+            {
+                if (def.maxLevelOverrides != null && pawn?.story?.traits != null)
+                {
+                    foreach (var overrideLevel in def.maxLevelOverrides)
+                    {
+                        if (overrideLevel.requiredTraits != null && overrideLevel.requiredTraits.All(t => t.HasTrait(pawn)))
+                        {
+                            return overrideLevel.maxLevel;
+                        }
+                    }
+                }
+                return def.maxLevel;
+            }
+        }
         public int skillPoints;
         public int curSpentSkillPoints;
         public int level;

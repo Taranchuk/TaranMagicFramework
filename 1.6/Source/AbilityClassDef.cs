@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -23,5 +23,12 @@ namespace TaranMagicFramework
         public StatDef damageResistanceMultiplierStat;
         public StatDef xpGainMultiplierStat;
         public List<string> exclusionTags;
+        public List<MaxLevelOverride> maxLevelOverrides;
+    }
+
+    public class MaxLevelOverride
+    {
+        public List<TraitRequirement> requiredTraits;
+        public int maxLevel;
     }
 }
