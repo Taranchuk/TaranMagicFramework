@@ -1,11 +1,10 @@
-﻿using Verse;
+using Verse;
 
 namespace TaranMagicFramework
 {
     public class HediffAbility : HediffWithComps
     {
         public Ability ability;
-
         public override void PostRemoved()
         {
             base.PostRemoved();

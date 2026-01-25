@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -149,7 +149,7 @@ namespace TaranMagicFramework
                 }
                 if (def.visibleWhenActive.NullOrEmpty() is false)
                 {
-                    return def.visibleWhenActive.All(x => abilityClass.GetLearnedAbility(x)?.Active ?? false);
+                    return def.visibleWhenActive.All(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false));
                 }
                 if (AbilityTier.hideWithHediffs.NullOrEmpty() is false)
                 {
@@ -160,7 +160,7 @@ namespace TaranMagicFramework
                 }
                 if (AbilityTier.hideWithAbilities.NullOrEmpty() is false)
                 {
-                    if (AbilityTier.hideWithAbilities.Any(x => abilityClass.GetLearnedAbility(x) != null))
+                    if (AbilityTier.hideWithAbilities.Any(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x) != null)))
                     {
                         return false;
                     }
