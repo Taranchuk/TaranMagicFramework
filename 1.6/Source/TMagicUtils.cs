@@ -26,7 +26,7 @@ namespace TaranMagicFramework
             }
         }
         private static Dictionary<AbilityTabDef, InspectTabBase> sharedInstances = new Dictionary<AbilityTabDef, InspectTabBase>();
-        private static ConcurrentDictionary<Pawn, ConcurrentDictionary<AbilityDef, AbilityClass>> abilityClassCache = new ();
+        private static ConcurrentDictionary<Pawn, ConcurrentDictionary<AbilityDef, AbilityClass>> abilityClassCache = new();
         static TMagicUtils()
         {
             foreach (var statDef in DefDatabase<StatDef>.AllDefs)

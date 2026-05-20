@@ -318,14 +318,6 @@ namespace TaranMagicFramework
 
         public virtual void ChangeLevel(int newLevel)
         {
-            if (newLevel > level && def.abilityTiers.Count > newLevel && abilityClass != null)
-            {
-                var nextTier = def.abilityTiers[newLevel];
-                if (nextTier.acquireRequirement != null && !nextTier.acquireRequirement.RequirementSatisfied(abilityClass, this))
-                {
-                    return;
-                }
-            }
             TMagicUtils.Message(def.label + " - Changing ability tier from " + level + " to " + newLevel, pawn);
             level = newLevel;
             if (PawnUtility.ShouldSendNotificationAbout(pawn) && AbilityTier.letterTitleKeyGained.NullOrEmpty() is false)

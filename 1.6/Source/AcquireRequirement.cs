@@ -188,6 +188,15 @@ namespace TaranMagicFramework
 
         private string RequiresDefs(List<Def> defs, string baseReason, string baseReasonPlural)
         {
+            if (defs.Any(x => x is TraitDef))
+            {
+                var traitDefs = defs.Cast<TraitDef>().ToList();
+                if (traitDefs.Count > 1)
+                {
+                    return baseReasonPlural.Translate(string.Join(", ", traitDefs.Select(x => x.DataAtDegree(0).label)));
+                }
+                return baseReason.Translate(traitDefs[0].DataAtDegree(0).label);
+            }
             if (defs.Count > 1)
             {
                 return baseReasonPlural.Translate(string.Join(", ", defs.Select(x => x.label)));
