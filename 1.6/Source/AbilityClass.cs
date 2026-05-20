@@ -198,11 +198,33 @@ namespace TaranMagicFramework
             var allAbilities = pawn.AllAvailableAbilities();
             if (allAbilities != null && learnedAbilities != null)
             {
-                var abilitiesToRemove = learnedAbilities.Where(x => !allAbilities.Contains(x.Value.def)).ToList();
-                foreach (var ability in abilitiesToRemove)
+                TMagicUtils.Message($"RemoveIncompatibleAbilities: Total learned abilities: {learnedAbilities.Count}", pawn);
+                TMagicUtils.Message($"RemoveIncompatibleAbilities: Total available abilities: {allAbilities.Count}", pawn);
+
+                foreach (var learned in learnedAbilities)
                 {
-                    RemoveAbility(ability.Value);
+                    bool isInAvailableList = allAbilities.Contains(learned.Value.def);
+                    TMagicUtils.Message($"RemoveIncompatibleAbilities: Learned ability {learned.Value.def.defName} - Available: {isInAvailableList}", pawn);
                 }
+
+                var abilitiesToRemove = learnedAbilities.Where(x => !allAbilities.Contains(x.Value.def)).ToList();
+
+                if (abilitiesToRemove.Any())
+                {
+                    foreach (var ability in abilitiesToRemove)
+                    {
+                        TMagicUtils.Message($"RemoveIncompatibleAbilities: Removing {ability.Value.def.defName} - not in available list", pawn);
+                        RemoveAbility(ability.Value);
+                    }
+                }
+                else
+                {
+                    TMagicUtils.Message($"RemoveIncompatibleAbilities: No abilities to remove", pawn);
+                }
+            }
+            else
+            {
+                TMagicUtils.Message($"RemoveIncompatibleAbilities: allAbilities or learnedAbilities is null", pawn);
             }
         }
 

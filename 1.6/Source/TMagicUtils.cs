@@ -13,10 +13,9 @@ namespace TaranMagicFramework
     public static class TMagicUtils
     {
         public static bool debug => false;
-
         public static void Message(string msg, Pawn pawn = null)
         {
-            if (debug)
+            if (debug && (pawn is null || pawn.Spawned))
             {
                 if (pawn != null)
                 {

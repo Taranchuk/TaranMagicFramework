@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using Verse.Sound;
 
 namespace TaranMagicFramework
@@ -84,8 +85,8 @@ namespace TaranMagicFramework
             {
                 return isActive;
             }
-            set 
-            { 
+            set
+            {
 
                 isActive = value;
             }
@@ -103,7 +104,7 @@ namespace TaranMagicFramework
         public virtual float EnergyCostNoMasteryCheck => abilityResource != null ? AbilityTier.EnergyCostFor(pawn, abilityResource.def, false) : 0;
         public virtual bool IsInstantAction => Verbs.Any() is false && AbilityTier.instantAction && AbilityTier.durationTicks == -1;
         public virtual TargetingParameters TargetingParameters => AbilityTier.TargetingParameters(pawn);
-        
+
         public virtual Texture2D AbilityIcon()
         {
             if (def.abilityTiers[level].icon is null)
@@ -317,6 +318,14 @@ namespace TaranMagicFramework
 
         public virtual void ChangeLevel(int newLevel)
         {
+            if (newLevel > level && def.abilityTiers.Count > newLevel && abilityClass != null)
+            {
+                var nextTier = def.abilityTiers[newLevel];
+                if (nextTier.acquireRequirement != null && !nextTier.acquireRequirement.RequirementSatisfied(abilityClass, this))
+                {
+                    return;
+                }
+            }
             TMagicUtils.Message(def.label + " - Changing ability tier from " + level + " to " + newLevel, pawn);
             level = newLevel;
             if (PawnUtility.ShouldSendNotificationAbout(pawn) && AbilityTier.letterTitleKeyGained.NullOrEmpty() is false)
@@ -355,7 +364,7 @@ namespace TaranMagicFramework
                 foreach (var otherAbilityDef in def.endAbilitiesWhenActive)
                 {
                     var otherAbility = pawn.GetAbility(otherAbilityDef);
-                    if (otherAbility != null && otherAbility.Active) 
+                    if (otherAbility != null && otherAbility.Active)
                     {
                         otherAbility.End();
                     }
@@ -485,7 +494,7 @@ namespace TaranMagicFramework
                     foreach (var abilityClass in compAbilities.abilityClasses)
                     {
                         var otherAbility = abilityClass.Value.GetLearnedAbility(abilityDef);
-                        if (otherAbility != null && otherAbility.Active) 
+                        if (otherAbility != null && otherAbility.Active)
                         {
                             otherAbility.End();
                         }
@@ -500,7 +509,7 @@ namespace TaranMagicFramework
         {
             foreach (var animation in animations.ToList())
             {
-                if (animation != null && animation.expireInTick <= 0 && animation.AnimationDef.maxLoopCount <= 0 
+                if (animation != null && animation.expireInTick <= 0 && animation.AnimationDef.maxLoopCount <= 0
                     && !animation.Destroyed)
                 {
                     animation.Destroy();
@@ -656,7 +665,6 @@ namespace TaranMagicFramework
                 }
             }
         }
-
 
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
@@ -818,7 +826,7 @@ namespace TaranMagicFramework
                         return;
                     }
                 }
-                pawn.jobs.StartJob(TMagicUtils.MakeJobAbility(this, target), lastJobEndCondition: Verse.AI.JobCondition.InterruptForced, resumeCurJobAfterwards: true);
+                pawn.jobs.StartJob(TMagicUtils.MakeJobAbility(this, target), lastJobEndCondition: JobCondition.InterruptForced, resumeCurJobAfterwards: true);
             }
             else
             {
@@ -950,7 +958,6 @@ namespace TaranMagicFramework
                     }
                 }
 
-
                 if (AbilityTier.xpGainWhileActive != null)
                 {
                     if (Find.TickManager.TicksGame % AbilityTier.xpGainWhileActive.ticksInterval == 0)
@@ -1036,8 +1043,7 @@ namespace TaranMagicFramework
 
         public virtual bool CanUseWhileInMentalState => false;
 
-
-        public virtual bool CanBeActivated(float energyCost, out string failReason, bool allowDisabling = false, 
+        public virtual bool CanBeActivated(float energyCost, out string failReason, bool allowDisabling = false,
             Func<string> canBeActivatedValidator = null)
         {
             failReason = "";
@@ -1089,10 +1095,9 @@ namespace TaranMagicFramework
                     }
                 }
 
-
                 if (AbilityTier.cannotBeActiveWithOtherAbilitiesInUse != null)
                 {
-                    var firstActiveAbility = compAbilities.AllLearnedAbilities.FirstOrDefault(x => 
+                    var firstActiveAbility = compAbilities.AllLearnedAbilities.FirstOrDefault(x =>
                     AbilityTier.cannotBeActiveWithOtherAbilitiesInUse.Contains(x.def) && x.Active);
                     if (firstActiveAbility != null)
                     {

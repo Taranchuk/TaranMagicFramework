@@ -286,22 +286,28 @@ namespace TaranMagicFramework
         public bool preventCheck;
         public void RecheckAbilities()
         {
+            TMagicUtils.Message($"RecheckAbilities: Starting for {Pawn.LabelShort}", Pawn);
             if (preventCheck)
             {
+                TMagicUtils.Message($"RecheckAbilities: Prevented by preventCheck flag", Pawn);
                 return;
             }
             TryAutoRemoveAbilities();
             TryAutoGainAbilities();
+            TMagicUtils.Message($"RecheckAbilities: Completed for {Pawn.LabelShort}", Pawn);
         }
 
         private void TryAutoRemoveAbilities()
         {
+            TMagicUtils.Message($"TryAutoRemoveAbilities: Starting check for {Pawn.LabelShort}", Pawn);
+
             var allSources = new List<Def>();
             for (int i = abilitySourcesTraits.Count - 1; i >= 0; i--)
             {
                 var source = abilitySourcesTraits[i];
                 if (Pawn.story.traits.HasTrait(source) is false)
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Missing trait {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);
                 }
             }
@@ -311,6 +317,7 @@ namespace TaranMagicFramework
                 var source = abilitySourcesHediffs[i];
                 if (Pawn.health.hediffSet.HasHediff(source) is false)
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Missing hediff {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);
                 }
             }
@@ -321,6 +328,7 @@ namespace TaranMagicFramework
                 if (Pawn.apparel.WornApparel.Any(x => x.def == source) is false
                     && Pawn.equipment.AllEquipmentListForReading.Any(x => x.def == source) is false)
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Missing apparel/equipment {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);
                 }
             }
@@ -330,6 +338,7 @@ namespace TaranMagicFramework
                 var source = abilitySourcesGenes[i];
                 if (Pawn.HasActiveGene(source) is false)
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Missing gene {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);
                 }
             }
@@ -342,23 +351,34 @@ namespace TaranMagicFramework
                 }
             }
 
+            TMagicUtils.Message($"TryAutoRemoveAbilities: Processing {abilityClasses.Count} ability classes", Pawn);
+
             foreach (var abilityClass in abilityClasses.Values.ToList())
             {
+                TMagicUtils.Message($"TryAutoRemoveAbilities: Processing ability class {abilityClass.def.defName}", Pawn);
                 abilityClass.RemoveIncompatibleAbilities();
                 var abilities = abilityClass.LearnedAbilities.ToList();
+
                 if (abilityClass.Unlocked is false)
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Class {abilityClass.def.defName} is locked, removing all abilities", Pawn);
                     foreach (var ability in abilities)
                     {
+                        TMagicUtils.Message($"TryAutoRemoveAbilities: Removing {ability.def.defName} from locked class", Pawn);
                         abilityClass.RemoveAbility(ability);
                     }
                 }
                 else
                 {
+                    TMagicUtils.Message($"TryAutoRemoveAbilities: Class {abilityClass.def.defName} is unlocked, checking tree access", Pawn);
                     foreach (var ability in abilities)
                     {
-                        if (abilityClass.UnlockedTrees.Any(x => ability.def.abilityTrees.Contains(x)) is false)
+                        bool hasAccessToTree = abilityClass.UnlockedTrees.Any(x => ability.def.abilityTrees.Contains(x));
+                        TMagicUtils.Message($"TryAutoRemoveAbilities: Ability {ability.def.defName} - has tree access: {hasAccessToTree}", Pawn);
+
+                        if (hasAccessToTree is false)
                         {
+                            TMagicUtils.Message($"TryAutoRemoveAbilities: Removing {ability.def.defName} - no tree access", Pawn);
                             abilityClass.RemoveAbility(ability);
                         }
                     }
@@ -405,7 +425,6 @@ namespace TaranMagicFramework
                     }
                 }
             }
-
 
             foreach (var hediff in Pawn.health.hediffSet.hediffs)
             {
