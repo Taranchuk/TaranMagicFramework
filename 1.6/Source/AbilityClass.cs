@@ -402,8 +402,9 @@ namespace TaranMagicFramework
             return thing.TakeDamage(dinfo);
         }
 
-        public float AdjustDamage(float damageAmount, Thing thing)
+        public virtual float AdjustDamage(float damageAmount, Thing thing)
         {
+            var original = damageAmount;
             if (def.damageMultiplierStat != null)
             {
                 damageAmount *= TMagicUtils.GetStatValueForStat(compAbilities, def.damageMultiplierStat);
@@ -416,9 +417,10 @@ namespace TaranMagicFramework
                     damageAmount *= resistanceMult;
                 }
             }
-            return damageAmount;
+            var floor = original * def.minDamageFraction;
+            return floor > 0f && damageAmount < floor ? floor : damageAmount;
         }
-        public void ExposeData()
+        public virtual void ExposeData()
         {
             Scribe_Defs.Look(ref def, "def");
             Scribe_References.Look(ref pawn, "pawn");

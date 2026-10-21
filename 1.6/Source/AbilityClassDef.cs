@@ -21,6 +21,7 @@ namespace TaranMagicFramework
         public StatDef cooldownTicksMultiplierStat;
         public StatDef damageMultiplierStat;
         public StatDef damageResistanceMultiplierStat;
+        public float minDamageFraction;
         public StatDef xpGainMultiplierStat;
         public List<string> exclusionTags;
         public List<MaxLevelOverride> maxLevelOverrides;

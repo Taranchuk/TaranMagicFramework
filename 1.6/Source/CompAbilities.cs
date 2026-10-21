@@ -305,7 +305,7 @@ namespace TaranMagicFramework
             for (int i = abilitySourcesTraits.Count - 1; i >= 0; i--)
             {
                 var source = abilitySourcesTraits[i];
-                if (Pawn.story.traits.HasTrait(source) is false)
+                if (Pawn.story?.traits?.HasTrait(source) is false)
                 {
                     TMagicUtils.Message($"TryAutoRemoveAbilities: Missing trait {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);
@@ -325,8 +325,8 @@ namespace TaranMagicFramework
             for (int i = abilitySourcesThings.Count - 1; i >= 0; i--)
             {
                 var source = abilitySourcesThings[i];
-                if (Pawn.apparel.WornApparel.Any(x => x.def == source) is false
-                    && Pawn.equipment.AllEquipmentListForReading.Any(x => x.def == source) is false)
+                if (Pawn.apparel?.WornApparel.Any(x => x.def == source) is false
+                    && Pawn.equipment?.AllEquipmentListForReading.Any(x => x.def == source) is false)
                 {
                     TMagicUtils.Message($"TryAutoRemoveAbilities: Missing apparel/equipment {source.defName}, will remove associated abilities", Pawn);
                     allSources.Add(source);

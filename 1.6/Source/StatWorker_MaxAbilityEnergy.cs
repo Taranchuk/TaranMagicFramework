@@ -10,18 +10,21 @@ namespace TaranMagicFramework
         {
             var comp = TMagicUtils.staticCompForStat ?? req.Thing?.TryGetComp<CompAbilities>();
             var extension = stat.GetModExtension<StatDefExtension>();
-            foreach (var ability in comp.AllLearnedAbilitiesWithResource(extension.abilityResource))
+            if (comp != null && extension != null)
             {
-                if (ability.MaxEnergyOffset != 0)
+                foreach (var ability in comp.AllLearnedAbilitiesWithResource(extension.abilityResource))
                 {
-                    val += ability.MaxEnergyOffset;
+                    if (ability.MaxEnergyOffset != 0)
+                    {
+                        val += ability.MaxEnergyOffset;
+                    }
                 }
-            }
-            foreach (var abilityClass in comp.AllUnlockedAbilityClassesWithResource(extension.abilityResource))
-            {
-                if (abilityClass.def.maxEnergyOffsetPerLevel != 0)
+                foreach (var abilityClass in comp.AllUnlockedAbilityClassesWithResource(extension.abilityResource))
                 {
-                    val += abilityClass.def.maxEnergyOffsetPerLevel * abilityClass.level;
+                    if (abilityClass.def.maxEnergyOffsetPerLevel != 0)
+                    {
+                        val += abilityClass.def.maxEnergyOffsetPerLevel * abilityClass.level;
+                    }
                 }
             }
             base.FinalizeValue(req, ref val, applyPostProcess);

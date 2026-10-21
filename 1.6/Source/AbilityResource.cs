@@ -68,7 +68,7 @@ namespace TaranMagicFramework
             this.def = def;
             this.pawn = pawn;
         }
-        public void ExposeData()
+        public virtual void ExposeData()
         {
             Scribe_Defs.Look(ref def, "def");
             Scribe_References.Look(ref pawn, "pawn");

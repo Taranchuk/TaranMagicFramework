@@ -167,10 +167,16 @@ namespace TaranMagicFramework
         public static CompAbilities staticCompForStat;
         public static float GetStatValueForStat(CompAbilities comp, StatDef stat)
         {
+            var previous = staticCompForStat;
             staticCompForStat = comp;
-            var result = comp.parent.GetStatValue(stat, cacheStaleAfterTicks: 0);
-            staticCompForStat = null;
-            return result;
+            try
+            {
+                return comp.parent.GetStatValue(stat, cacheStaleAfterTicks: 0);
+            }
+            finally
+            {
+                staticCompForStat = previous;
+            }
         }
 
         public static List<AbilityDef> AllAvailableAbilities(this Pawn pawn)
