@@ -123,6 +123,7 @@ namespace TaranMagicFramework
         }
 
         public virtual Func<string> CanBeActivatedValidator() => null;
+        public bool VisibleWhenActiveSatisfied => def.visibleWhenActive.NullOrEmpty() || def.visibleWhenActive.All(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false));
         public virtual bool ShouldShowGizmos
         {
             get
@@ -148,9 +149,9 @@ namespace TaranMagicFramework
                 {
                     return false;
                 }
-                if (def.visibleWhenActive.NullOrEmpty() is false)
+                if (VisibleWhenActiveSatisfied is false)
                 {
-                    return def.visibleWhenActive.All(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false));
+                    return false;
                 }
                 if (AbilityTier.hideWithHediffs.NullOrEmpty() is false)
                 {

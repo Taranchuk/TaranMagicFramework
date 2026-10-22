@@ -61,7 +61,10 @@ namespace TaranMagicFramework
 
             yield return Toils_General.Do(delegate
             {
-                Job.ability.Start();
+                if (Job.ability.IsValid(Job.ability.curTarget, throwMessages: false))
+                {
+                    Job.ability.Start();
+                }
             });
         }
     }

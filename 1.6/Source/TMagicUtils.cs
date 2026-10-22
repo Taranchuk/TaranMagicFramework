@@ -357,6 +357,51 @@ namespace TaranMagicFramework
             return false;
         }
 
+        public static void GainXP(this Pawn pawn, AbilityClassDef classDef, float xp)
+        {
+            var abilityClass = pawn.GetComp<CompAbilities>()?.GetAbilityClass(classDef);
+            if (abilityClass is { Unlocked: true })
+            {
+                abilityClass.GainXP(xp);
+            }
+        }
+
+        public static T GetAbilityClass<T>(this Pawn pawn) where T : AbilityClass
+        {
+            var comp = pawn.GetComp<CompAbilities>();
+            if (comp?.abilityClasses == null)
+            {
+                return null;
+            }
+            foreach (var abilityClass in comp.abilityClasses.Values)
+            {
+                if (abilityClass is T match)
+                {
+                    return match;
+                }
+            }
+            return null;
+        }
+
+        public static Hediff GetHediff(this Pawn pawn, HediffDef hediffDef)
+        {
+            return pawn?.health?.hediffSet?.GetFirstHediffOfDef(hediffDef);
+        }
+
+        public static bool HasTrait(this Pawn pawn, TraitDef traitDef, int degree = -1)
+        {
+            if (pawn?.story?.traits is null)
+            {
+                return false;
+            }
+            return degree >= 0 ? pawn.story.traits.HasTrait(traitDef, degree) : pawn.story.traits.HasTrait(traitDef);
+        }
+
+        public static bool HasApparel(this Pawn pawn, ThingDef apparelDef)
+        {
+            return pawn?.apparel?.WornApparel.Any(a => a.def == apparelDef) is true;
+        }
+
         public static JobAbility MakeJobAbility(Ability ability, LocalTargetInfo targetA)
         {
             JobAbility job = MakeJobAbility(ability);

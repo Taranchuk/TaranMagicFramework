@@ -593,7 +593,7 @@ namespace TaranMagicFramework
             }
             bool debug = false;
             var abilities = comp.AllLearnedAbilities.Where(x => x.AbilityTier.aiAbilityWorker != null
-            && (!x.Active && x.CanBeActivated(x.EnergyCost, out _, canBeActivatedValidator: x.CanBeActivatedValidator())));
+            && (!x.Active && x.VisibleWhenActiveSatisfied && x.CanBeActivated(x.EnergyCost, out _, canBeActivatedValidator: x.CanBeActivatedValidator())));
             if (debug) Log.Message("Checking pawn: " + __instance.pawn + " - " + string.Join(", ", comp.abilityResources.Select(x => x.Key + " - " + x.Value.energy)));
             foreach (var abilityGroup in abilities.GroupBy(x => x.AbilityTier.AIAbilityWorker.Priority(x)).OrderByDescending(x => x.Key))
             {
