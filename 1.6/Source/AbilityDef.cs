@@ -18,6 +18,7 @@ namespace TaranMagicFramework
         public List<UnlockedWhenMastered> unlockedWhenMasteredList;
         public List<AbilityDef> unlockedWhenMastered;
         public List<AbilityDef> visibleWhenActive;
+        public List<AbilityDef> visibleWhenActiveOneOf;
         public List<AbilityDef> endAbilitiesWhenActive;
         public List<AbilityDef> endAbilitiesWhenEnded;
         public Texture2D icon;

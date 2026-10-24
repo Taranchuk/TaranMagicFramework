@@ -25,9 +25,9 @@ namespace TaranMagicFramework
         {
             var rect = new Rect(topLeft.x, topLeft.y, GetWidth(maxWidth), 75f);
             var result = base.GizmoOnGUI(topLeft, maxWidth, parms);
-            if (ability.lastActivatedTick > 0)
+            if (ability.CooldownStartTick > 0)
             {
-                int cooldownTicksRemaining = Find.TickManager.TicksGame - ability.lastActivatedTick;
+                int cooldownTicksRemaining = Find.TickManager.TicksGame - ability.CooldownStartTick;
                 if (cooldownTicksRemaining < ability.cooldownPeriod)
                 {
                     float num = Mathf.InverseLerp(ability.cooldownPeriod, 0, cooldownTicksRemaining);

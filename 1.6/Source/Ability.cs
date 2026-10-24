@@ -50,6 +50,7 @@ namespace TaranMagicFramework
         public bool FullyLearned => MaxLevel == level;
         public int lastActivatedTick, lastEndedTick;
         public int cooldownPeriod;
+        public int CooldownStartTick => AbilityTier.cooldownOnEnd ? lastEndedTick : lastActivatedTick;
         public virtual float MaxEnergyOffset => Active ? AbilityTier.maxEnergyOffset : 0;
         public virtual int CastTicks
         {
@@ -123,7 +124,21 @@ namespace TaranMagicFramework
         }
 
         public virtual Func<string> CanBeActivatedValidator() => null;
-        public bool VisibleWhenActiveSatisfied => def.visibleWhenActive.NullOrEmpty() || def.visibleWhenActive.All(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false));
+        public bool VisibleWhenActiveSatisfied
+        {
+            get
+            {
+                if (def.visibleWhenActive.NullOrEmpty() is false && def.visibleWhenActive.All(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false)) is false)
+                {
+                    return false;
+                }
+                if (def.visibleWhenActiveOneOf.NullOrEmpty() is false && def.visibleWhenActiveOneOf.Any(x => compAbilities.abilityClasses.Values.Any(ac => ac.GetLearnedAbility(x)?.Active ?? false)) is false)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
         public virtual bool ShouldShowGizmos
         {
             get
@@ -1058,12 +1073,12 @@ namespace TaranMagicFramework
 
             if (!Active)
             {
-                if (lastActivatedTick > 0)
+                if (CooldownStartTick > 0)
                 {
-                    int cooldownTicksRemaining = Find.TickManager.TicksGame - lastActivatedTick;
+                    int cooldownTicksRemaining = Find.TickManager.TicksGame - CooldownStartTick;
                     if (cooldownTicksRemaining < cooldownPeriod)
                     {
-                        failReason = "AbilityOnCooldown".Translate((lastActivatedTick + cooldownPeriod - Find.TickManager.TicksGame).ToStringTicksToPeriod());
+                        failReason = "AbilityOnCooldown".Translate((CooldownStartTick + cooldownPeriod - Find.TickManager.TicksGame).ToStringTicksToPeriod());
                         return false;
                     }
                 }
