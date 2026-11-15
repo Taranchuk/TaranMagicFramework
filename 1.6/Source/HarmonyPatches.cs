@@ -196,7 +196,7 @@ namespace TaranMagicFramework
     {
         public static void Prefix(LogEntry_DamageResult log)
         {
-            if (log is BattleLogEntry_RangedImpact battleLog && battleLog.weaponDef is null)
+            if (log is BattleLogEntry_RangedImpact battleLog && battleLog.weaponDef is null && battleLog.initiatorPawn != null)
             {
                 battleLog.weaponDef = battleLog.initiatorPawn.def;
             }
